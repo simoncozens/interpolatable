@@ -1,0 +1,11 @@
+[workspace]
+resolver = "2"
+
+members = ["interpolatable-lib", "interpolatable-cli", "interpolatable-python"]
+
+default-members = ["interpolatable-lib", "interpolatable-cli"]
+
+[workspace.dependencies]
+serde_json = { version = "1.0", features = ["preserve_order"] }
+read-fonts = "0.22"
+skrifa = "0.22"

@@ -1,0 +1,8 @@
+[project]
+name="interpolatable"
+[tool.maturin]
+name = "interpolatable"
+
+[build-system]
+requires = ["maturin>=1.3.2"]
+build-backend = "maturin"

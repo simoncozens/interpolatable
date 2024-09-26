@@ -1,0 +1,15 @@
+[package]
+name = "interpolatable-cli"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+path = "src/main.rs"
+name = "interpolatable"
+
+[dependencies]
+interpolatable = { path = "../interpolatable-lib", features = ["skrifa"] }
+serde_json = { workspace = true }
+skrifa = { workspace = true }
+read-fonts = { workspace = true }
+clap = { version = "3.2.5", features = ["derive"] }
