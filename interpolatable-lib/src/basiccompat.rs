@@ -1,6 +1,6 @@
 use crate::{problems::Problem, Glyph};
 
-pub(crate) fn test_compatibility<'a>(glyph1: &'a Glyph, glyph2: &'a Glyph) -> Vec<Problem<'a>> {
+pub(crate) fn test_compatibility<'a>(glyph1: &'a Glyph, glyph2: &'a Glyph) -> Vec<Problem> {
     let mut problems = vec![];
     if glyph1.curves.len() != glyph2.curves.len() {
         problems.push(Problem::path_count(

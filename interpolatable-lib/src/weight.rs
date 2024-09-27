@@ -11,7 +11,7 @@ pub(crate) fn test_over_underweight<'a>(
     mid: &BezPath,
     tolerance: f64,
     ix: usize,
-) -> Vec<Problem<'a>> {
+) -> Vec<Problem> {
     let mut problems = vec![];
     if (m0_vector[0] < 0.0) == (m1_vector[0] < 0.0) {
         return problems;

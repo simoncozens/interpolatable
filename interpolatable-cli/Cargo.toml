@@ -9,7 +9,13 @@ name = "interpolatable"
 
 [dependencies]
 interpolatable = { path = "../interpolatable-lib", features = ["skrifa"] }
-serde_json = { workspace = true }
+serde_json = { workspace = true, features = ["preserve_order"] }
 skrifa = { workspace = true }
 read-fonts = { workspace = true }
 clap = { version = "3.2.5", features = ["derive"] }
+cairo-rs = { version = "0.20", features = ["pdf"] }
+sha1_smol = "1.0"
+itertools = "0.13.0"
+kurbo = { workspace = true }
+indexmap = { version = "1.9", features = ["serde-1"] }
+indicatif = "0.17"

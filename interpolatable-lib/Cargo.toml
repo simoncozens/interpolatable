@@ -9,7 +9,7 @@ path = "src/lib.rs"
 [dependencies]
 greencurves = { path = "../../../bezier-things/greencurves" }
 # greencurves = "0.2.0"
-kurbo = "0.11"
+kurbo = { workspace = true }
 skrifa = { workspace = true, optional = true }
 munkres = "0.5"
 serde = { version = "1.0", features = ["derive"] }

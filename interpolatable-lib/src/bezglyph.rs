@@ -17,6 +17,10 @@ impl BezGlyph {
         }
         self.0.last_mut().unwrap()
     }
+
+    pub fn iter(&self) -> impl Iterator<Item = &BezPath> {
+        self.0.iter()
+    }
 }
 
 #[cfg(feature = "skrifa")]

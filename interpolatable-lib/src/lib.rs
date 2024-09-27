@@ -32,9 +32,9 @@ enum NodeType {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-struct GlyfPoint {
-    point: Point,
-    is_control: bool,
+pub struct GlyfPoint {
+    pub point: Point,
+    pub is_control: bool,
 }
 impl GlyfPoint {
     fn offcurve(pt: Point) -> Self {
@@ -69,7 +69,7 @@ pub struct Glyph {
     control_stats: Vec<greencurves::ControlStatistics>,
     green_vectors: Vec<Vec<f64>>,
     control_vectors: Vec<Vec<f64>>,
-    points: Vec<Vec<GlyfPoint>>,
+    pub points: Vec<Vec<GlyfPoint>>,
     isomorphisms: Vec<Isomorphisms>,
 }
 
@@ -195,7 +195,7 @@ pub fn run_tests<'a>(
     tolerance: Option<f64>,
     kinkiness: Option<f64>,
     upem: Option<u16>,
-) -> Vec<Problem<'a>> {
+) -> Vec<Problem> {
     let tolerance = tolerance.unwrap_or(0.95);
     let mut problems = vec![];
 

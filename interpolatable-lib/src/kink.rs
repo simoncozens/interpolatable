@@ -15,7 +15,7 @@ pub(crate) fn test_kink<'a>(
     tolerance: f64,
     kinkiness: Option<f64>,
     upem: Option<u16>,
-) -> Vec<Problem<'a>> {
+) -> Vec<Problem> {
     let kinkiness = kinkiness.unwrap_or(DEFAULT_KINKINESS);
     let deviation_threshold =
         upem.unwrap_or(DEFAULT_UPEM) as f64 * DEFAULT_KINKINESS_LENGTH * DEFAULT_KINKINESS
