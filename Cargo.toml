@@ -7,6 +7,6 @@ default-members = ["interpolatable-lib", "interpolatable-cli"]
 
 [workspace.dependencies]
 serde_json = { version = "1.0", features = ["preserve_order"] }
-read-fonts = "0.22"
-skrifa = "0.22"
+read-fonts = "0"
+skrifa = "0"
 kurbo = "0.11"
