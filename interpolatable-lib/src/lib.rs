@@ -5,7 +5,7 @@ use greencurves::{ComputeControlStatistics, ComputeGreenStatistics, CurveStatist
 use isomorphism::Isomorphisms;
 use itertools::Itertools;
 use kurbo::{BezPath, Point};
-pub use problems::Problem;
+pub use problems::{Problem, ProblemDetails};
 
 #[cfg(feature = "skrifa")]
 use skrifa::{prelude::*, setting::VariationSetting};
