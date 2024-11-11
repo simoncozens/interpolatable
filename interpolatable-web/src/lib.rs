@@ -1,7 +1,7 @@
-use std::{collections::HashMap, default};
+use std::collections::HashMap;
 
 use indexmap::IndexMap;
-use interpolatable::{run_tests, Problem};
+use interpolatable::run_tests;
 // use js_sys::{Reflect, Uint8Array};
 use read_fonts::{
     tables::{fvar::VariationAxisRecord, post::DEFAULT_GLYPH_NAMES},
