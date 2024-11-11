@@ -1,4 +1,3 @@
-use bitvec::prelude::*;
 use kurbo::Vec2;
 
 use crate::GlyfPoint;
@@ -13,7 +12,7 @@ pub(crate) struct Characteristic {
 pub(crate) struct Isomorphisms(pub(crate) Vec<Characteristic>);
 
 fn points_complex_vector(points: Vec<GlyfPoint>) -> Vec<Vec2> {
-    let mut vector = vec![];
+    let mut vector = Vec::with_capacity(points.len() * 4);
     let len = points.len();
     let cycle_index = |x| x % len;
     for i in 0..points.len() {
@@ -38,7 +37,7 @@ fn points_complex_vector(points: Vec<GlyfPoint>) -> Vec<Vec2> {
 
 fn points_characteristic_bits<'a>(
     points: impl DoubleEndedIterator<Item = &'a GlyfPoint>,
-) -> BitVec<u8, Msb0> {
+) -> Vec<bool> {
     points.rev().map(|pt| pt.is_control).collect()
 }
 
