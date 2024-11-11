@@ -113,8 +113,10 @@ class Interpolatable {
   }
 
   renderResults(results) {
-    if (!results) {
+    if (!Object.keys(results).length) {
       $("#cupcake").removeClass("d-none");
+      console.log("cupcake")
+      return;
     }
     let ix = 0;
     for (let [glyph, problems] of Object.entries(results)) {
