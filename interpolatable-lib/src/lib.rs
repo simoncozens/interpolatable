@@ -1,3 +1,5 @@
+#![deny(clippy::unwrap_used)]
+#![deny(clippy::expect_used)]
 pub use bezglyph::BezGlyph;
 use greencurves::{ComputeControlStatistics, ComputeGreenStatistics, CurveStatistics};
 use isomorphism::Isomorphisms;
@@ -296,6 +298,8 @@ pub fn run_tests<'a>(
 #[cfg(test)]
 #[cfg(feature = "skrifa")]
 mod tests {
+    #![allow(clippy::expect_used)]
+    #![allow(clippy::unwrap_used)]
     use serde_json::json;
     use skrifa::{FontRef, MetadataProvider};
 

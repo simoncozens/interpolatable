@@ -9,12 +9,14 @@ impl BezGlyph {
     }
     pub fn next(&mut self) -> &mut BezPath {
         self.0.push(BezPath::new());
+        #[allow(clippy::unwrap_used)] // We just added it
         self.0.last_mut().unwrap()
     }
     pub fn current(&mut self) -> &mut BezPath {
         if self.0.is_empty() {
             self.0.push(BezPath::new());
         }
+        #[allow(clippy::unwrap_used)] // We know it's not empty
         self.0.last_mut().unwrap()
     }
 

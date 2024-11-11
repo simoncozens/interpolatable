@@ -6,6 +6,9 @@ edition = "2021"
 [lib]
 path = "src/lib.rs"
 
+[dev-dependencies]
+serde_json = "1.0"
+
 [dependencies]
 greencurves = "0.2.0"
 kurbo = { workspace = true }

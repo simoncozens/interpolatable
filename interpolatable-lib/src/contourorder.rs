@@ -1,7 +1,9 @@
 use munkres::{Position, Weights};
 
-use crate::utils::{Matching, VdiffHypo2};
-use crate::Glyph;
+use crate::{
+    utils::{Matching, VdiffHypo2},
+    Glyph,
+};
 
 pub(crate) fn test_contour_order<'a>(
     glyph1: &'a Glyph,
@@ -90,10 +92,13 @@ fn matching_for_vectors(m0: &Vec<Vec<f64>>, m1: &Vec<Vec<f64>>) -> (Matching, f6
         }
     }
     let mut costs = munkres::WeightMatrix::from_row_vec(m0.len(), weights);
-    let matching = munkres::solve_assignment(&mut costs).unwrap();
-    let matching_cost = matching.iter().map(|pos| costs.element_at(*pos)).sum();
-    let identity_cost = (0..m0.len())
-        .map(|i| costs.element_at(Position { row: i, column: i }))
-        .sum();
-    (Matching(matching), matching_cost, identity_cost)
+    if let Ok(matching) = munkres::solve_assignment(&mut costs) {
+        let matching_cost = matching.iter().map(|pos| costs.element_at(*pos)).sum();
+        let identity_cost = (0..m0.len())
+            .map(|i| costs.element_at(Position { row: i, column: i }))
+            .sum();
+        (Matching(matching), matching_cost, identity_cost)
+    } else {
+        (Matching(vec![]), 0.0, 0.0)
+    }
 }
