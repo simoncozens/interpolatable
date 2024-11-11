@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 
-members = ["interpolatable-lib", "interpolatable-cli", "interpolatable-python"]
+members = ["interpolatable-lib", "interpolatable-cli", "interpolatable-python", "interpolatable-web"]
 
 default-members = ["interpolatable-lib", "interpolatable-cli"]
 

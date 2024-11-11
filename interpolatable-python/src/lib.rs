@@ -68,8 +68,6 @@ impl Glyph {
         let value: Vec<(String, Vec<(f32, f32)>)> = pen.getattr("value")?.extract()?;
         let mut bezglyph = BezGlyph::default();
         replay_recording(&mut bezglyph, value);
-        println!("Bezglyph: {:?}", bezglyph);
-
         let mut glyph: TwisterGlyph = bezglyph.into();
         glyph.master_name = master_name;
         glyph.master_index = master_index;

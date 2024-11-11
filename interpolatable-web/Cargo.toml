@@ -1,0 +1,18 @@
+[package]
+name = "interpolatable-web"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+wasm-bindgen = { version = "0.2.63" }
+console_error_panic_hook = { version = "0.1.6" }
+js-sys = { version = "0.3.68" }
+interpolatable = { path = "../interpolatable-lib", features=["skrifa"] }
+read-fonts = {workspace = true }
+skrifa = {workspace = true }
+serde_json = { version = "1.0.96", features = ["preserve_order"] }
+indexmap = { version = "1.9", features = ["serde-1"] }
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+path = "src/lib.rs"
