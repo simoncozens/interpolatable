@@ -22,13 +22,11 @@ pub(crate) fn test_starting_point(
         .iter()
         .map(|c1| c0.rotated_list.vdiff_hypot2(&c1.rotated_list))
         .collect();
-    let (mut min_index, mut min_cost) =
-        costs.iter().copied().enumerate().min_by(|(_, a), (_, b)| {
-            // These values are the sums of hypotenuses of the differences
-            // so they cannot be NaN.
-            #[allow(clippy::unwrap_used)]
-            a.partial_cmp(b).unwrap()
-        })?;
+    let (mut min_index, mut min_cost) = costs
+        .iter()
+        .copied()
+        .enumerate()
+        .min_by(|(_, a), (_, b)| a.total_cmp(b))?;
     let mut first_cost = *costs.first()?;
     let proposed_point = m1_isomorphisms.get(min_index)?.rotation;
     let reverse = m1_isomorphisms.get(min_index)?.reverse;
@@ -104,13 +102,11 @@ pub(crate) fn test_starting_point(
                 .map(|c1| new_c0.vdiff_hypot2(&c1.rotated_list))
                 .collect();
             first_cost = *costs.first()?;
-            (min_index, min_cost) =
-                costs.iter().copied().enumerate().min_by(|(_, a), (_, b)| {
-                    // These values are the sums of hypotenuses of the differences
-                    // so they cannot be NaN.
-                    #[allow(clippy::unwrap_used)]
-                    a.partial_cmp(b).unwrap()
-                })?;
+            (min_index, min_cost) = costs
+                .iter()
+                .copied()
+                .enumerate()
+                .min_by(|(_, a), (_, b)| a.total_cmp(b))?;
         }
     }
     let this_tolerance = if first_cost != 0.0 {
