@@ -7,8 +7,7 @@ edition = "2021"
 path = "src/lib.rs"
 
 [dependencies]
-greencurves = { path = "../../../bezier-things/greencurves" }
-# greencurves = "0.2.0"
+greencurves = "0.2.0"
 kurbo = { workspace = true }
 skrifa = { workspace = true, optional = true }
 munkres = "0.5"
