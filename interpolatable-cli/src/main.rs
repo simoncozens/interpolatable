@@ -5,7 +5,7 @@ use std::{collections::HashMap, path::PathBuf};
 
 use clap::Parser;
 use indexmap::IndexMap;
-use indicatif::{ProgressBar, ProgressIterator};
+use indicatif::ProgressIterator;
 use interpolatable::{run_tests, Problem};
 use plot::InterpolatablePlot;
 use read_fonts::{
@@ -71,19 +71,37 @@ impl DenormalizeLocation for FontRef<'_> {
 }
 
 fn glyph_variations(font: &FontRef, gid: GlyphId) -> Result<Vec<Vec<VariationSetting>>, ReadError> {
-    font.gvar()
+    let variation_data = font
+        .gvar()
         .expect("Can't open gvar table")
-        .glyph_variation_data(gid)
-        .map(|data| {
-            data.tuples()
-                .map(|t| {
-                    let tuple: Vec<f32> =
-                        t.peak().values.iter().map(|v| v.get().to_f32()).collect();
-                    font.denormalize_location(&tuple)
-                        .expect("Can't denormalize location")
-                })
-                .collect()
+        .glyph_variation_data(gid)?;
+
+    let mut variations: Vec<Vec<VariationSetting>> = variation_data
+        .tuples()
+        .map(|t| {
+            let tuple: Vec<f32> = t.peak().values.iter().map(|v| v.get().to_f32()).collect();
+            font.denormalize_location(&tuple)
+                .expect("Can't denormalize location")
         })
+        .collect();
+    // Sort by length of non-default locations, and then from min to max
+    variations.sort_by(|a, b| {
+        let a_nondefault = a.iter().filter(|v| v.value != 0.0).count();
+        let b_nondefault = b.iter().filter(|v| v.value != 0.0).count();
+        let length_ordering = a_nondefault.cmp(&b_nondefault);
+        if length_ordering != std::cmp::Ordering::Equal {
+            return length_ordering;
+        }
+        a.iter()
+            .zip(b.iter())
+            .fold(std::cmp::Ordering::Equal, |acc, (a, b)| {
+                if acc != std::cmp::Ordering::Equal {
+                    return acc;
+                }
+                a.selector.cmp(&b.selector)
+            })
+    });
+    Ok(variations)
 }
 
 pub fn glyph_name_for_id(fontref: &FontRef, gid: usize) -> String {
@@ -128,35 +146,45 @@ fn main() {
         default_glyph.master_name = "default".to_string();
         default_glyph.master_index = 0;
         if let Ok(variations) = glyph_variations(&font, gid.into()) {
-            for variation in variations {
-                let mut glyph = interpolatable::Glyph::new_from_font(&font, gid.into(), &variation)
-                    .expect("Can't convert glyph");
-                glyph.master_name = variation
+            let variation_glyphs = variations.iter().map(|loc| {
+                let mut glyph = interpolatable::Glyph::new_from_font(&font, gid.into(), loc)
+                    .expect("Couldn't convert glyph");
+                glyph.master_name = loc
                     .iter()
                     .map(|v| format!("{}={}", v.selector, v.value))
                     .collect::<Vec<_>>()
                     .join(",");
-                if !locations.contains(&variation) {
-                    locations.push(variation.clone());
+                if !locations.contains(loc) {
+                    locations.push(loc.clone());
                 }
-                glyph.master_index = locations.iter().position(|x| x == &variation).unwrap();
-                let problems = run_tests(
-                    &default_glyph,
-                    &glyph,
-                    None,
-                    None,
-                    Some(font.head().unwrap().units_per_em()),
-                );
-                if !problems.is_empty() {
-                    let glyphname = glyph_name_for_id(&font, gid.into());
-                    if !args.json {
-                        println!("Problems with glyph {}:", &glyphname);
-                        for problem in problems.iter() {
-                            println!("  {:#?}", problem);
+                glyph.master_index = locations.iter().position(|x| x == loc).unwrap();
+                glyph
+            });
+
+            let to_test = std::iter::once(default_glyph)
+                .chain(variation_glyphs)
+                .collect::<Vec<_>>();
+            for pair in to_test.windows(2) {
+                if let [before, after] = pair {
+                    // println!("Testing {} vs {}", after.master_name, before.master_name);
+                    let problems = run_tests(
+                        before,
+                        after,
+                        None,
+                        None,
+                        Some(font.head().unwrap().units_per_em()),
+                    );
+                    if !problems.is_empty() {
+                        let glyphname = glyph_name_for_id(&font, gid.into());
+                        if !args.json {
+                            println!("Problems with glyph {}:", &glyphname);
+                            for problem in problems.iter() {
+                                println!("  {:#?}", problem);
+                            }
                         }
+                        glyphname_to_id.insert(glyphname.clone(), gid.into());
+                        report.insert(glyphname.clone(), problems);
                     }
-                    glyphname_to_id.insert(glyphname.clone(), gid.into());
-                    report.insert(glyphname.clone(), problems);
                 }
             }
         }
