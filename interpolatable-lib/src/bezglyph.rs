@@ -7,6 +7,7 @@ impl BezGlyph {
     pub fn new_from_paths(b: Vec<BezPath>) -> Self {
         BezGlyph(b)
     }
+    #[allow(clippy::should_implement_trait)]
     pub fn next(&mut self) -> &mut BezPath {
         self.0.push(BezPath::new());
         #[allow(clippy::unwrap_used)] // We just added it

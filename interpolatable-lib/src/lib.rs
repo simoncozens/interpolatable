@@ -1,7 +1,6 @@
 #![deny(clippy::unwrap_used)]
 #![deny(clippy::expect_used)]
 use core::fmt;
-use std::fmt::Display;
 
 pub use bezglyph::BezGlyph;
 use greencurves::{ComputeControlStatistics, ComputeGreenStatistics, CurveStatistics};
