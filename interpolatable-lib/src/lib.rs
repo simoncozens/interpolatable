@@ -1,5 +1,8 @@
 #![deny(clippy::unwrap_used)]
 #![deny(clippy::expect_used)]
+use core::fmt;
+use std::fmt::Display;
+
 pub use bezglyph::BezGlyph;
 use greencurves::{ComputeControlStatistics, ComputeGreenStatistics, CurveStatistics};
 use isomorphism::Isomorphisms;
@@ -33,7 +36,7 @@ enum NodeType {
     ClosePath,
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(PartialEq, Clone)]
 pub struct GlyfPoint {
     pub point: Point,
     pub is_control: bool,
@@ -50,6 +53,22 @@ impl GlyfPoint {
             point: pt,
             is_control: true,
         }
+    }
+}
+
+impl fmt::Debug for GlyfPoint {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{}({}, {})",
+            if self.is_control {
+                "OFFCURVE"
+            } else {
+                "ONCURVE"
+            },
+            self.point.x,
+            self.point.y
+        )
     }
 }
 
