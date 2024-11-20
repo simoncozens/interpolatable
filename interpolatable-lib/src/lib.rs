@@ -20,7 +20,7 @@ mod isomorphism;
 mod kink;
 mod problems;
 mod startingpoint;
-mod utils;
+pub mod utils;
 mod weight;
 
 #[derive(Debug)]
