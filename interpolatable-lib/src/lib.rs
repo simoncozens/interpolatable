@@ -161,10 +161,6 @@ impl From<BezGlyph> for Glyph {
                     }
                 }
             }
-            // if points.first() == points.last() && points.len() > 1 {
-            //     points.pop();
-            //     types.pop();
-            // }
 
             glyph.isomorphisms.push(Isomorphisms::new(&points));
             glyph.points.push(points);

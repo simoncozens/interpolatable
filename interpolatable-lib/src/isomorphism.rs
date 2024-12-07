@@ -43,6 +43,14 @@ fn points_characteristic_bits<'a>(
 
 impl Isomorphisms {
     pub(crate) fn new(points: &[GlyfPoint]) -> Self {
+        let points = if points.len() > 1
+            && points.first() == points.last()
+            && points.first().map(|x| x.is_control) == Some(true)
+        {
+            &points[0..points.len() - 1]
+        } else {
+            &points[0..points.len()]
+        };
         let mut isomorphism = Self::default();
         isomorphism.add(points, false);
         isomorphism.add(points, true);
@@ -67,7 +75,6 @@ impl Isomorphisms {
         let mult: usize = vector.len() / n;
 
         for i in 0..n {
-            bits.rotate_right(1);
             if bits == reference_bits {
                 let rotations = i * mult;
                 let mut rotated = vector.clone();
@@ -78,6 +85,7 @@ impl Isomorphisms {
                     reverse,
                 });
             }
+            bits.rotate_right(1);
         }
     }
 
