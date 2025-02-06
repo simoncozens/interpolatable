@@ -136,7 +136,9 @@ pub fn glyph_variations(
     font: &FontRef,
     gid: GlyphId,
 ) -> Result<Vec<Vec<VariationSetting>>, ReadError> {
-    let variation_data = font.gvar()?.glyph_variation_data(gid)?;
+    let Some(variation_data) = font.gvar()?.glyph_variation_data(gid)? else {
+        return Ok(vec![]);
+    };
 
     let variations: Result<Vec<Vec<VariationSetting>>, ReadError> = variation_data
         .tuples()
