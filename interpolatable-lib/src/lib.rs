@@ -12,6 +12,7 @@
 //!
 //! It is a port of Behdad Esfahbod's [fontTools.varLib.interpolatable](https://github.com/fonttools/fonttools/).
 pub use bezglyph::BezGlyph;
+use core::fmt;
 use greencurves::{ComputeControlStatistics, ComputeGreenStatistics, CurveStatistics};
 use isomorphism::Isomorphisms;
 #[cfg(feature = "skrifa")]
@@ -22,7 +23,6 @@ pub use problems::{Problem, ProblemDetails};
 use skrifa::{prelude::*, setting::VariationSetting};
 use startingpoint::test_starting_point;
 use utils::lerp_curve;
-use core::fmt;
 
 mod basiccompat;
 mod bezglyph;
@@ -44,7 +44,7 @@ enum NodeType {
     ClosePath,
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(PartialEq, Clone)]
 /// A point in a glyph
 pub struct GlyfPoint {
     /// Point coordinates
