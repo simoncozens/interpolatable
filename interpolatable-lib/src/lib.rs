@@ -1,15 +1,25 @@
 #![deny(clippy::unwrap_used)]
 #![deny(clippy::expect_used)]
+#![deny(missing_docs, rustdoc::missing_crate_level_docs)]
+//! Font interpolation tester
+//!
+//! This library is designed to test the interpolatability of glyphs
+//! in variable fonts. It can find problems such as:
+//! - Wrong starting points
+//! - Kinks
+//! - Over- and under-weighted contours
+//! - Contour order
+//!
+//! It is a port of Behdad Esfahbod's [fontTools.varLib.interpolatable](https://github.com/fonttools/fonttools/).
 pub use bezglyph::BezGlyph;
 use greencurves::{ComputeControlStatistics, ComputeGreenStatistics, CurveStatistics};
 use isomorphism::Isomorphisms;
+#[cfg(feature = "skrifa")]
 use itertools::Itertools;
 use kurbo::{BezPath, Point};
 pub use problems::{Problem, ProblemDetails};
-
 #[cfg(feature = "skrifa")]
 use skrifa::{prelude::*, setting::VariationSetting};
-
 use startingpoint::test_starting_point;
 use utils::lerp_curve;
 
@@ -34,8 +44,11 @@ enum NodeType {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+/// A point in a glyph
 pub struct GlyfPoint {
+    /// Point coordinates
     pub point: Point,
+    /// Whether the point is a control point
     pub is_control: bool,
 }
 impl GlyfPoint {
@@ -63,15 +76,23 @@ impl GlyfPoint {
 /// passing them to `run_tests`.
 #[derive(Default)]
 pub struct Glyph {
+    /// The name of the master
     pub master_name: String,
+    /// The index of the master
     pub master_index: usize,
-    // types: Vec<Vec<NodeType>>,
+    /// The glyph's contours
     pub curves: Vec<BezPath>,
+    /// The glyph's statistics, computed according to Green's theorem
     green_stats: Vec<greencurves::GreenStatistics>,
+    /// The glyph's statistics, computed according to the control points
     control_stats: Vec<greencurves::ControlStatistics>,
+    /// Control vectors from Green's theorem statistics
     green_vectors: Vec<Vec<f64>>,
+    /// Control vectors from control point statistics
     control_vectors: Vec<Vec<f64>>,
+    /// The glyph's points
     pub points: Vec<Vec<GlyfPoint>>,
+    /// The glyph's isomorphisms
     isomorphisms: Vec<Isomorphisms>,
 }
 
@@ -158,6 +179,9 @@ impl From<BezGlyph> for Glyph {
 
 #[cfg(feature = "skrifa")]
 impl Glyph {
+    /// Create a new glyph from a font and a glyph ID
+    ///
+    /// Uses the `skrifa` library to extract the glyph outline from the font.
     pub fn new_from_font(
         font: &FontRef,
         glyph_id: GlyphId,

@@ -1,7 +1,10 @@
 [package]
 name = "interpolatable"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
+description = "Library for testing font interpolatability"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/simoncozens/interpolatable"
 
 [lib]
 path = "src/lib.rs"
