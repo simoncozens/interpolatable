@@ -1,6 +1,6 @@
 [package]
 name = "interpolatable"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 description = "Library for testing font interpolatability"
 license = "MIT OR Apache-2.0"
