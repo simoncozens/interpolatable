@@ -1,30 +1,31 @@
-use kurbo::{BezPath, PathEl};
+// use kurbo::{BezPath, PathEl};
 use skrifa::outline::OutlinePen;
 
-trait Draw {
-    fn draw(&self, cairo: &cairo::Context);
-}
+// trait Draw {
+//     fn draw(&self, cairo: &cairo::Context);
+// }
 
-impl Draw for BezPath {
-    fn draw(&self, cairo: &cairo::Context) {
-        for el in self.elements() {
-            match el {
-                PathEl::MoveTo(p) => cairo.move_to(p.x, p.y),
-                PathEl::LineTo(p) => cairo.line_to(p.x, p.y),
-                PathEl::QuadTo(p0, p1) => {
-                    let (px, py) = cairo.current_point().unwrap();
-                    let cx0 = (px + 2.0 * p0.x) / 3.0;
-                    let cy0 = (py + 2.0 * p1.x) / 3.0;
-                    let cx1 = (p1.x + 2.0 * p0.x) / 3.0;
-                    let cy1 = (p1.y + 2.0 * p0.y) / 3.0;
-                    cairo.curve_to(cx0, cy0, cx1, cy1, p1.x, p1.y);
-                }
-                PathEl::CurveTo(p0, p1, p2) => cairo.curve_to(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y),
-                PathEl::ClosePath => cairo.close_path(),
-            }
-        }
-    }
-}
+// impl Draw for BezPath {
+//     fn draw(&self, cairo: &cairo::Context) {
+//         for el in self.elements() {
+//             match el {
+//                 PathEl::MoveTo(p) => cairo.move_to(p.x, p.y),
+//                 PathEl::LineTo(p) => cairo.line_to(p.x, p.y),
+//                 PathEl::QuadTo(p0, p1) => {
+//                     let (px, py) = cairo.current_point().unwrap();
+//                     let cx0 = (px + 2.0 * p0.x) / 3.0;
+//                     let cy0 = (py + 2.0 * p1.x) / 3.0;
+//                     let cx1 = (p1.x + 2.0 * p0.x) / 3.0;
+//                     let cy1 = (p1.y + 2.0 * p0.y) / 3.0;
+//                     cairo.curve_to(cx0, cy0, cx1, cy1, p1.x, p1.y);
+//                 }
+//                 PathEl::CurveTo(p0, p1, p2) => cairo.curve_to(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y),
+//                 PathEl::ClosePath => cairo.close_path(),
+//             }
+//         }
+//     }
+// }
+
 pub(crate) struct CairoPen<'a>(pub &'a cairo::Context);
 
 impl<'a> CairoPen<'a> {

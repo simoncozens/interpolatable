@@ -3,10 +3,7 @@ use munkres::Position;
 #[cfg(feature = "skrifa")]
 use skrifa::{
     raw::ReadError,
-    raw::{
-        tables::fvar::VariationAxisRecord, tables::post::PString,
-        tables::post::DEFAULT_GLYPH_NAMES, types::Version16Dot16, TableProvider,
-    },
+    raw::{tables::fvar::VariationAxisRecord, TableProvider},
     setting::VariationSetting,
     FontRef, GlyphId,
 };
@@ -62,7 +59,7 @@ impl VdiffHypo2 for Vec<Vec2> {
     }
 }
 
-pub struct Matching(pub(crate) Vec<Position>);
+pub(crate) struct Matching(pub(crate) Vec<Position>);
 
 impl Matching {
     pub fn reorder<T: Clone>(&self, data: &[T]) -> Vec<T> {
@@ -76,7 +73,7 @@ impl Matching {
         self.0.len()
     }
 
-    #[must_use]
+    #[allow(dead_code)]
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
@@ -110,6 +107,7 @@ fn poor_mans_denormalize(peak: f32, axis: &VariationAxisRecord) -> f32 {
 }
 
 #[cfg(feature = "skrifa")]
+/// A trait for denormalizing a location tuple into a friendly representation in userspace.
 pub trait DenormalizeLocation {
     /// Given a normalized location tuple, turn it back into a friendly representation in userspace
     fn denormalize_location(&self, tuple: &[f32]) -> Result<Vec<VariationSetting>, ReadError>;
@@ -132,6 +130,11 @@ impl DenormalizeLocation for FontRef<'_> {
 }
 
 #[cfg(feature = "skrifa")]
+/// Find all the variations for a given glyph id.
+///
+/// Given a font and a glyph id, this function will return all the locations at
+/// which the glyph is defined in the font. This includes all the locations
+/// defined in the `gvar` table, as well as the default location.
 pub fn glyph_variations(
     font: &FontRef,
     gid: GlyphId,
@@ -166,36 +169,4 @@ pub fn glyph_variations(
             })
     });
     Ok(variations)
-}
-
-#[cfg(feature = "skrifa")]
-pub fn glyph_name_for_id(fontref: &FontRef, gid: usize) -> Result<String, ReadError> {
-    if let Ok(post) = fontref.post() {
-        match post.version() {
-            Version16Dot16::VERSION_1_0 => {
-                if let Some(name) = DEFAULT_GLYPH_NAMES.get(gid) {
-                    return Ok(name.to_string());
-                }
-            }
-            Version16Dot16::VERSION_2_0 => {
-                if let Some(string_data) = post.string_data() {
-                    let strings: Vec<Option<PString>> =
-                        string_data.iter().map(|x| x.ok()).collect();
-                    if let Some(index) = post.glyph_name_index() {
-                        let idx = index.get(gid).ok_or(ReadError::InvalidArrayLen)?.get() as usize;
-                        if idx < 258 {
-                            return Ok(DEFAULT_GLYPH_NAMES[idx].to_string());
-                        } else {
-                            let entry = strings.get(idx - 258).ok_or(ReadError::InvalidArrayLen)?;
-                            if let Some(name) = entry.map(|x| x.to_string()) {
-                                return Ok(name);
-                            }
-                        }
-                    }
-                }
-            }
-            _ => {}
-        }
-    }
-    Ok(format!("gid{:}", gid))
 }

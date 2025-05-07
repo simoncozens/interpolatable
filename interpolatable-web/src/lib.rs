@@ -3,11 +3,11 @@ use std::collections::HashMap;
 use indexmap::IndexMap;
 use interpolatable::{
     run_tests,
-    utils::{glyph_name_for_id, glyph_variations, DenormalizeLocation},
+    utils::{glyph_variations, DenormalizeLocation},
 };
 use read_fonts::TableProvider;
 use serde_json::{json, Value};
-use skrifa::{setting::VariationSetting, GlyphId};
+use skrifa::{setting::VariationSetting, GlyphId, MetadataProvider};
 use wasm_bindgen::prelude::*;
 extern crate console_error_panic_hook;
 
@@ -42,6 +42,7 @@ pub fn check_font(font_data: &[u8]) -> Result<String, JsValue> {
     let mut report: IndexMap<String, Vec<Value>> = IndexMap::new();
     let mut glyphname_to_id: HashMap<String, GlyphId> = HashMap::new();
     let mut locations: Vec<Vec<VariationSetting>> = vec![vec![]];
+    let glyphnames = font.glyph_names();
     let default_location = font
         .denormalize_location(&vec![0.0; font.fvar().unwrap().axes().unwrap().len()])
         .unwrap();
@@ -79,8 +80,10 @@ pub fn check_font(font_data: &[u8]) -> Result<String, JsValue> {
                         Some(font.head().unwrap().units_per_em()),
                     );
                     if !problems.is_empty() {
-                        let glyphname = glyph_name_for_id(&font, gid.into())
-                            .unwrap_or_else(|_| format!("gid{}", gid));
+                        let glyphname = glyphnames
+                            .get(gid.into())
+                            .map(|s| s.to_string())
+                            .unwrap_or_else(|| format!("gid{}", gid));
                         glyphname_to_id.insert(glyphname.clone(), gid.into());
                         let default_outline: Vec<String> =
                             before.curves.iter().map(|c| c.to_svg()).collect();

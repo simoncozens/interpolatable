@@ -6,14 +6,10 @@ use std::{collections::HashMap, path::PathBuf};
 use clap::Parser;
 use indexmap::IndexMap;
 use indicatif::ProgressIterator;
-use interpolatable::{
-    run_tests,
-    utils::{glyph_name_for_id, glyph_variations},
-    Problem,
-};
+use interpolatable::{run_tests, utils::glyph_variations, Problem};
 use plot::InterpolatablePlot;
 use read_fonts::TableProvider;
-use skrifa::{setting::VariationSetting, FontRef, GlyphId};
+use skrifa::{setting::VariationSetting, FontRef, GlyphId, MetadataProvider};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -35,8 +31,8 @@ fn main() {
     let fontdata = std::fs::read(&args.font).expect("Can't read font file");
     let font = FontRef::new(&fontdata).expect("Can't parse font");
     let mut report: IndexMap<String, Vec<Problem>> = IndexMap::new();
-    let mut glyphname_to_id: HashMap<String, GlyphId> = HashMap::new();
     let mut locations: Vec<Vec<VariationSetting>> = vec![vec![]];
+    let glyphnames = font.glyph_names();
     for gid in (0..font.maxp().expect("Can't open maxp table").num_glyphs()).progress() {
         let mut default_glyph = interpolatable::Glyph::new_from_font(&font, gid.into(), &[])
             .expect("Can't convert glyph");
@@ -72,15 +68,16 @@ fn main() {
                         Some(font.head().unwrap().units_per_em()),
                     );
                     if !problems.is_empty() {
-                        let glyphname =
-                            glyph_name_for_id(&font, gid.into()).expect("Can't get name");
+                        let glyphname = glyphnames
+                            .get(gid.into())
+                            .map(|s| s.to_string())
+                            .unwrap_or_else(|| format!("gid{}", gid));
                         if !args.json {
                             println!("Problems with glyph {}:", &glyphname);
                             for problem in problems.iter() {
                                 println!("  {:#?}", problem);
                             }
                         }
-                        glyphname_to_id.insert(glyphname.clone(), gid.into());
                         report.insert(glyphname.clone(), problems);
                     }
                 }
@@ -91,6 +88,11 @@ fn main() {
     if args.json {
         println!("{}", serde_json::to_string_pretty(&report).unwrap());
     }
+
+    let glyphname_to_id: HashMap<String, GlyphId> = glyphnames
+        .iter()
+        .map(|(i, name)| (name.to_string(), i))
+        .collect();
 
     if let Some(pdf) = args.pdf {
         let surface =

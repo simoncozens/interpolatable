@@ -31,6 +31,7 @@ mod isomorphism;
 mod kink;
 mod problems;
 mod startingpoint;
+/// Utility functions for interpolatability testing
 pub mod utils;
 mod weight;
 

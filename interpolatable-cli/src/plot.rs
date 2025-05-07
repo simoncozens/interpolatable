@@ -8,10 +8,7 @@ use indexmap::IndexMap;
 use interpolatable::{BezGlyph, Glyph, Problem};
 use itertools::Itertools;
 use kurbo::{Rect, Shape};
-use skrifa::{
-    prelude::LocationRef, setting::VariationSetting, string::StringId, FontRef, GlyphId,
-    MetadataProvider,
-};
+use skrifa::{setting::VariationSetting, string::StringId, FontRef, GlyphId, MetadataProvider};
 
 use crate::cairopen::CairoPen;
 
@@ -61,20 +58,20 @@ impl<'a> InterpolatablePlot<'a> {
     const PAD: f64 = 0.1 * 72.0;
     const TITLE_FONT_SIZE: f64 = 24.0;
     const FONT_SIZE: f64 = 16.0;
-    const PAGE_NUMBER: f64 = 1.0;
+    // const PAGE_NUMBER: f64 = 1.0;
     const HEAD_COLOR: (f64, f64, f64) = (0.3, 0.3, 0.3);
     const LABEL_COLOR: (f64, f64, f64) = (0.2, 0.2, 0.2);
     const BORDER_COLOR: (f64, f64, f64) = (0.9, 0.9, 0.9);
-    const BORDER_WIDTH: f64 = 0.5;
+    // const BORDER_WIDTH: f64 = 0.5;
     const FILL_COLOR: (f64, f64, f64) = (0.8, 0.8, 0.8);
     const STROKE_COLOR: (f64, f64, f64) = (0.1, 0.1, 0.1);
     const STROKE_WIDTH: f64 = 1.0;
-    const ONCURVE_NODE_COLOR: (f64, f64, f64, f64) = (0.0, 0.8, 0.0, 0.7);
-    const ONCURVE_NODE_DIAMETER: f64 = 6.0;
-    const OFFCURVE_NODE_COLOR: (f64, f64, f64, f64) = (0.0, 0.5, 0.0, 0.7);
-    const OFFCURVE_NODE_DIAMETER: f64 = 4.0;
-    const HANDLE_COLOR: (f64, f64, f64, f64) = (0.0, 0.5, 0.0, 0.7);
-    const HANDLE_WIDTH: f64 = 0.5;
+    // const ONCURVE_NODE_COLOR: (f64, f64, f64, f64) = (0.0, 0.8, 0.0, 0.7);
+    // const ONCURVE_NODE_DIAMETER: f64 = 6.0;
+    // const OFFCURVE_NODE_COLOR: (f64, f64, f64, f64) = (0.0, 0.5, 0.0, 0.7);
+    // const OFFCURVE_NODE_DIAMETER: f64 = 4.0;
+    // const HANDLE_COLOR: (f64, f64, f64, f64) = (0.0, 0.5, 0.0, 0.7);
+    // const HANDLE_WIDTH: f64 = 0.5;
     const CORRECTED_START_POINT_COLOR: (f64, f64, f64, f64) = (0.0, 0.9, 0.0, 0.7);
     const CORRECTED_START_POINT_SIZE: f64 = 7.0;
     const WRONG_START_POINT_COLOR: (f64, f64, f64, f64) = (1.0, 0.0, 0.0, 0.7);
@@ -93,7 +90,7 @@ impl<'a> InterpolatablePlot<'a> {
         (1.0, 0.0, 1.0, 1.0),
         (0.0, 1.0, 1.0, 1.0),
     ];
-    const CONTOUR_ALPHA: f64 = 0.5;
+    // const CONTOUR_ALPHA: f64 = 0.5;
     const WEIGHT_ISSUE_CONTOUR_COLOR: (f64, f64, f64, f64) = (0.0, 0.0, 0.0, 0.4);
     const NO_ISSUES_LABEL: &'static str = "Your font's good! Have a cupcake...";
     const NO_ISSUES_LABEL_COLOR: (f64, f64, f64) = (0.0, 0.5, 0.0);
@@ -125,17 +122,17 @@ impl<'a> InterpolatablePlot<'a> {
 ";
     const EMOTICON_COLOR: (f64, f64, f64) = (0.0, 0.3, 0.3);
     const SHRUG: &'static str = r#"\_(")_/"#;
-    const UNDERWEIGHT: &'static str = r"
- o
-/|\
-/ \
-";
-    const OVERWEIGHT: &'static str = r"
- o
-/O\
-/ \
-";
-    const YAY: &'static str = r" \o/ ";
+    //     const UNDERWEIGHT: &'static str = r"
+    //  o
+    // /|\
+    // / \
+    // ";
+    //     const OVERWEIGHT: &'static str = r"
+    //  o
+    // /O\
+    // / \
+    // ";
+    // const YAY: &'static str = r" \o/ ";
 }
 
 impl Drop for InterpolatablePlot<'_> {
@@ -144,7 +141,7 @@ impl Drop for InterpolatablePlot<'_> {
         self.surface.finish();
     }
 }
-impl<'a> InterpolatablePlot<'a> {
+impl InterpolatablePlot<'_> {
     pub fn show_page(&mut self) -> Result<(), Error> {
         self.page_number += 1;
         cairo::Context::new(self.surface).unwrap().show_page()
@@ -159,8 +156,8 @@ impl<'a> InterpolatablePlot<'a> {
     ) -> Result<(), Error> {
         let pad = InterpolatablePlot::PAD;
         let width = self.width - 3.0 * pad;
-        let height = self.height - 2.0 * pad;
-        let mut x = pad;
+        // let height = self.height - 2.0 * pad;
+        let x = pad;
         let mut y = pad;
 
         self.draw_label(
@@ -597,7 +594,7 @@ impl<'a> InterpolatablePlot<'a> {
             return Ok(());
         }
         self.toc.insert(self.page_number, glyphname.to_string());
-        let first_problem_type = problems[0].problem_type();
+        // let first_problem_type = problems[0].problem_type();
         let problem_types = problems
             .iter()
             .map(|problem| problem.problem_type())
@@ -702,7 +699,7 @@ impl<'a> InterpolatablePlot<'a> {
         self.draw_glyph(
             &midway_location,
             glyphname,
-            &problems,
+            problems,
             0,
             x,
             y,
@@ -713,12 +710,13 @@ impl<'a> InterpolatablePlot<'a> {
         Ok(())
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn draw_glyph(
         &self,
         location: &Vec<VariationSetting>,
         glyphname: &str,
         problems: &[&Problem],
-        which: usize,
+        _which: usize,
         x: f64,
         y: f64,
         scale: Option<f64>,
