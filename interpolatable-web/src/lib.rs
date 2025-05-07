@@ -131,7 +131,6 @@ pub fn check_font(font_data: &[u8]) -> Result<String, JsValue> {
     let default_location = font
         .denormalize_location(&vec![0.0; font.fvar().unwrap().axes().unwrap().len()])
         .unwrap();
-    log(&format!("{:?}", default_location));
     for gid in 0..font.maxp().expect("Can't open maxp table").num_glyphs() {
         let mut default_glyph = interpolatable::Glyph::new_from_font(&font, gid.into(), &[])
             .expect("Can't convert glyph");
