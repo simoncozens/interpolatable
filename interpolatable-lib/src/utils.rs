@@ -1,12 +1,12 @@
-use kurbo::{BezPath, Vec2};
-use munkres::Position;
-#[cfg(feature = "skrifa")]
-use skrifa::{
+#[cfg(feature = "fontations")]
+use fontations::skrifa::{
     raw::ReadError,
     raw::{tables::fvar::VariationAxisRecord, TableProvider},
     setting::VariationSetting,
     FontRef, GlyphId,
 };
+use kurbo::{BezPath, Vec2};
+use munkres::Position;
 
 pub(crate) fn lerp_curve(c0: &BezPath, c1: &BezPath) -> Option<BezPath> {
     let mut new = BezPath::new();
@@ -87,7 +87,7 @@ fn lerp(a: f32, b: f32, t: f32) -> f32 {
     a + (b - a) * t
 }
 
-#[cfg(feature = "skrifa")]
+#[cfg(feature = "fontations")]
 fn poor_mans_denormalize(peak: f32, axis: &VariationAxisRecord) -> f32 {
     // Insert avar here
 
@@ -106,14 +106,14 @@ fn poor_mans_denormalize(peak: f32, axis: &VariationAxisRecord) -> f32 {
     }
 }
 
-#[cfg(feature = "skrifa")]
+#[cfg(feature = "fontations")]
 /// A trait for denormalizing a location tuple into a friendly representation in userspace.
 pub trait DenormalizeLocation {
     /// Given a normalized location tuple, turn it back into a friendly representation in userspace
     fn denormalize_location(&self, tuple: &[f32]) -> Result<Vec<VariationSetting>, ReadError>;
 }
 
-#[cfg(feature = "skrifa")]
+#[cfg(feature = "fontations")]
 impl DenormalizeLocation for FontRef<'_> {
     fn denormalize_location(&self, tuple: &[f32]) -> Result<Vec<VariationSetting>, ReadError> {
         let all_axes = self.fvar()?.axes()?;
@@ -129,7 +129,7 @@ impl DenormalizeLocation for FontRef<'_> {
     }
 }
 
-#[cfg(feature = "skrifa")]
+#[cfg(feature = "fontations")]
 /// Find all the variations for a given glyph id.
 ///
 /// Given a font and a glyph id, this function will return all the locations at

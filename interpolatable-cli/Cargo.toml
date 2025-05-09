@@ -8,10 +8,9 @@ path = "src/main.rs"
 name = "interpolatable"
 
 [dependencies]
-interpolatable = { path = "../interpolatable-lib", features = ["skrifa"] }
+interpolatable = { path = "../interpolatable-lib", features = ["fontations"] }
 serde_json = { workspace = true, features = ["preserve_order"] }
-skrifa = { workspace = true }
-read-fonts = { workspace = true }
+fontations = { workspace = true }
 clap = { version = "3.2.5", features = ["derive"] }
 cairo-rs = { version = "0.20", features = ["pdf"] }
 sha1_smol = "1.0"

@@ -13,14 +13,14 @@
 //! It is a port of Behdad Esfahbod's [fontTools.varLib.interpolatable](https://github.com/fonttools/fonttools/).
 pub use bezglyph::BezGlyph;
 use core::fmt;
+#[cfg(feature = "fontations")]
+use fontations::skrifa::{prelude::*, setting::VariationSetting};
 use greencurves::{ComputeControlStatistics, ComputeGreenStatistics, CurveStatistics};
 use isomorphism::Isomorphisms;
-#[cfg(feature = "skrifa")]
+#[cfg(feature = "fontations")]
 use itertools::Itertools;
 use kurbo::{BezPath, Point};
 pub use problems::{Problem, ProblemDetails};
-#[cfg(feature = "skrifa")]
-use skrifa::{prelude::*, setting::VariationSetting};
 use startingpoint::test_starting_point;
 use utils::lerp_curve;
 
@@ -191,7 +191,7 @@ impl From<BezGlyph> for Glyph {
     }
 }
 
-#[cfg(feature = "skrifa")]
+#[cfg(feature = "fontations")]
 impl Glyph {
     /// Create a new glyph from a font and a glyph ID
     ///
@@ -204,8 +204,10 @@ impl Glyph {
         let collection = font.outline_glyphs();
         let loc = font.axes().location(location);
         let outlined = collection.get(glyph_id)?;
-        let settings =
-            skrifa::outline::DrawSettings::unhinted(skrifa::prelude::Size::unscaled(), &loc);
+        let settings = fontations::skrifa::outline::DrawSettings::unhinted(
+            fontations::skrifa::prelude::Size::unscaled(),
+            &loc,
+        );
         let mut bezglyph = BezGlyph::default();
         outlined.draw(settings, &mut bezglyph).ok()?;
         let mut glyph: Glyph = bezglyph.into();
@@ -334,7 +336,7 @@ pub fn run_tests<'a>(
 }
 
 #[cfg(test)]
-#[cfg(feature = "skrifa")]
+#[cfg(feature = "fontations")]
 mod tests {
     #![allow(clippy::expect_used)]
     #![allow(clippy::unwrap_used)]

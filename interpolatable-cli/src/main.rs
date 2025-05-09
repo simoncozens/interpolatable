@@ -4,12 +4,12 @@ mod plot;
 use std::{collections::HashMap, path::PathBuf};
 
 use clap::Parser;
+use fontations::read::TableProvider;
+use fontations::skrifa::{setting::VariationSetting, FontRef, GlyphId, MetadataProvider};
 use indexmap::IndexMap;
 use indicatif::ProgressIterator;
 use interpolatable::{run_tests, utils::glyph_variations, Problem};
 use plot::InterpolatablePlot;
-use read_fonts::TableProvider;
-use skrifa::{setting::VariationSetting, FontRef, GlyphId, MetadataProvider};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
