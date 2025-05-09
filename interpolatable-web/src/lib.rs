@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
+use fontations::read::TableProvider;
+use fontations::skrifa::{setting::VariationSetting, GlyphId, MetadataProvider};
 use indexmap::IndexMap;
 use interpolatable::{
     run_tests,
     utils::{glyph_variations, DenormalizeLocation},
 };
-use read_fonts::TableProvider;
 use serde_json::{json, Value};
-use skrifa::{setting::VariationSetting, GlyphId, MetadataProvider};
 use wasm_bindgen::prelude::*;
 extern crate console_error_panic_hook;
 
@@ -37,7 +37,7 @@ extern "C" {
 
 #[wasm_bindgen]
 pub fn check_font(font_data: &[u8]) -> Result<String, JsValue> {
-    let font = skrifa::FontRef::new(font_data).map_err(|e| e.to_string())?;
+    let font = fontations::skrifa::FontRef::new(font_data).map_err(|e| e.to_string())?;
 
     let mut report: IndexMap<String, Vec<Value>> = IndexMap::new();
     let mut glyphname_to_id: HashMap<String, GlyphId> = HashMap::new();
