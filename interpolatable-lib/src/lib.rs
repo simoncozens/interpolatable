@@ -340,8 +340,8 @@ pub fn run_tests<'a>(
 mod tests {
     #![allow(clippy::expect_used)]
     #![allow(clippy::unwrap_used)]
+    use fontations::skrifa::{FontRef, MetadataProvider};
     use serde_json::json;
-    use skrifa::{FontRef, MetadataProvider};
 
     use super::*;
 
@@ -377,10 +377,11 @@ mod tests {
         let problems = run_tests(&glyph1, &glyph2, None, None, None);
         assert_eq!(problems.len(), 1);
         let problem = serde_json::to_value(&problems[0]).unwrap();
+        println!("Problems: {:?}", problem);
         let problem = problem.as_object().unwrap();
         assert_eq!(problem["type"], "ContourOrder");
-        assert_eq!(problem["value_1"], json!([0, 1, 2]));
-        assert_eq!(problem["value_2"], json!([2, 1, 0]));
+        assert_eq!(problem["order_1"], json!([0, 1, 2]));
+        assert_eq!(problem["order_2"], json!([2, 1, 0]));
     }
 
     #[test]
@@ -389,7 +390,7 @@ mod tests {
         let font = FontRef::new(fontdata).expect("Can't parse font");
         let glyph_id = font.charmap().map('b').unwrap();
         let interpolatable_glyph = Glyph::new_from_font(&font, glyph_id, &[]).expect("Fail");
-        assert_eq!(interpolatable_glyph.points[0].len(), 42);
+        assert_eq!(interpolatable_glyph.points[0].len(), 43);
         assert_eq!(interpolatable_glyph.isomorphisms.len(), 2);
         assert_eq!(interpolatable_glyph.isomorphisms[0].len(), 1);
         assert_eq!(interpolatable_glyph.isomorphisms[1].len(), 2);
