@@ -65,7 +65,7 @@ impl Matching {
     pub fn reorder<T: Clone>(&self, data: &[T]) -> Vec<T> {
         let mut result = vec![];
         for pos in self.iter() {
-            result.push(data[pos.row].clone());
+            result.push(data[pos.column].clone());
         }
         result
     }
