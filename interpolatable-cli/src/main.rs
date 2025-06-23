@@ -22,6 +22,9 @@ pub struct Args {
     #[clap(short, long)]
     pdf: Option<String>,
 
+    #[clap(long)]
+    glyphs: Vec<String>,
+
     /// The font file to test
     pub font: PathBuf,
 }
@@ -34,6 +37,13 @@ fn main() {
     let mut locations: Vec<Vec<VariationSetting>> = vec![vec![]];
     let glyphnames = font.glyph_names();
     for gid in (0..font.maxp().expect("Can't open maxp table").num_glyphs()).progress() {
+        let glyph_name = glyphnames
+            .get(gid.into())
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| format!("gid{}", gid));
+        if !args.glyphs.is_empty() && !args.glyphs.contains(&glyph_name) {
+            continue;
+        }
         let mut default_glyph = interpolatable::Glyph::new_from_font(&font, gid.into(), &[])
             .expect("Can't convert glyph");
         default_glyph.master_name = "default".to_string();
