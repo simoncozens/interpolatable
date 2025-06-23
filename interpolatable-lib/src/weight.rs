@@ -21,23 +21,23 @@ pub(crate) fn test_over_underweight<'a>(
     let size1 = m1_vector[0] * m1_vector[0];
     let mid_size = mid_stats[0] * mid_stats[0];
 
-    // Check for overweight
-    let expected = size0.max(size1);
-    if 1e-5f64 + expected / tolerance < mid_size {
-        let this_tolerance = if mid_size == 0.0 {
-            0.0
-        } else {
-            expected / mid_size
-        };
-        problems.push(Problem::overweight(
-            glyph_a,
-            glyph_b,
-            ix,
-            this_tolerance,
-            size0,
-            size1,
-        ));
-    }
+    // Check for overweight (disabled in Python, too many false positives)
+    // let expected = size0.max(size1);
+    // if 1e-5f64 + expected / tolerance < mid_size {
+    //     let this_tolerance = if mid_size == 0.0 {
+    //         0.0
+    //     } else {
+    //         expected / mid_size
+    //     };
+    //     problems.push(Problem::overweight(
+    //         glyph_a,
+    //         glyph_b,
+    //         ix,
+    //         this_tolerance,
+    //         size0,
+    //         size1,
+    //     ));
+    // }
 
     // Check for underweight
     let expected = (size0 * size1).sqrt();

@@ -179,6 +179,7 @@ impl Problem {
         }
     }
 
+    #[allow(dead_code)]
     pub(crate) fn overweight(
         g1: &Glyph,
         g2: &Glyph,
