@@ -13,7 +13,7 @@ pub(crate) fn test_over_underweight<'a>(
     ix: usize,
 ) -> Vec<Problem> {
     let mut problems = vec![];
-    if (m0_vector[0] < 0.0) == (m1_vector[0] < 0.0) {
+    if (m0_vector[0] < 0.0) != (m1_vector[0] < 0.0) {
         return problems;
     }
     let mid_stats = stats_to_vectors(&mid.green_statistics());
