@@ -59,6 +59,7 @@ impl VdiffHypo2 for Vec<Vec2> {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct Matching(pub(crate) Vec<Position>);
 
 impl Matching {
