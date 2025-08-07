@@ -199,9 +199,9 @@ dependencies = [
 
 [[package]]
 name = "fontations"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d02f283ce06cb9e6245b3052f217fb57365b2fdfc295c79367c81bd8be552c73"
+checksum = "6ce83f5942797f03c95b06864da889bc5a6acf543cd5bbf108ea114d898fc824"
 dependencies = [
  "font-types",
  "read-fonts",
@@ -419,7 +419,7 @@ checksum = "f4c7245a08504955605670dbf141fceab975f15ca21570696aebe9d2e71576bd"
 
 [[package]]
 name = "interpolatable"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "fontations",
  "greencurves",
@@ -763,9 +763,9 @@ checksum = "60a357793950651c4ed0f3f52338f53b2f809f32d83a07f72909fa13e4c6c1e3"
 
 [[package]]
 name = "read-fonts"
-version = "0.30.1"
+version = "0.31.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "192735ef611aac958468e670cb98432c925426f3cb71521fda202130f7388d91"
+checksum = "a76192a41e824262f0e86922b0ab6dc770c4600f3b2a9373fe33439727a918d5"
 dependencies = [
  "bytemuck",
  "font-types",
@@ -833,9 +833,9 @@ checksum = "bbfa15b3dddfee50a0fff136974b3e1bde555604ba463834a7eb7deb6417705d"
 
 [[package]]
 name = "skrifa"
-version = "0.32.0"
+version = "0.33.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6d632b5a73f566303dbeabd344dc3e716fd4ddc9a70d6fc8ea8e6f06617da97"
+checksum = "cb886d448c2a43b337448919c17947d33dd9f98defd37cf333d63cdfe5fff6ef"
 dependencies = [
  "bytemuck",
  "read-fonts",
@@ -1168,9 +1168,9 @@ dependencies = [
 
 [[package]]
 name = "write-fonts"
-version = "0.39.0"
+version = "0.39.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "793874be1f717e08867d5e925576eff8ff979167e13c0ac666380fdf12ce8c71"
+checksum = "cac89848aeba9b7e1877f1e89e3f9c95adb8771f640e1ef23c605aa734748c2b"
 dependencies = [
  "font-types",
  "indexmap 2.9.0",
