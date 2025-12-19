@@ -25,6 +25,8 @@ jobs:
           submodules: recursive
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         name: Set up Rust for caching
+      - name: Install glib dependencies
+        run: sudo apt-get install -y libglib2.0-dev
       - name: Build
         run: cargo build
 
@@ -37,6 +39,8 @@ jobs:
           submodules: recursive
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         name: Set up Rust for caching
+      - name: Install glib dependencies
+        run: sudo apt-get install -y libglib2.0-dev
 
       - name: Lint for formatting
         run: cargo fmt --all -- --check
@@ -49,6 +53,8 @@ jobs:
           submodules: recursive
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         name: Set up Rust for caching
+      - name: Install glib dependencies
+        run: sudo apt-get install -y libglib2.0-dev
       - name: Lint for warnings
         run: cargo clippy --all-targets --all-features -- -D warnings
 
@@ -113,6 +119,9 @@ jobs:
         with:
           target: ${{ matrix.os.target }}
           cache-key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
+      - name: Install glib dependencies
+        run: sudo apt-get install -y libglib2.0-dev
+        if: matrix.os.build == 'linux'
       # - name: Set up python
       #   uses: actions/setup-python@v5
       #   with:
