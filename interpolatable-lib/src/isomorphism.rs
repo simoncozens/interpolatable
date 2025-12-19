@@ -93,7 +93,7 @@ impl Isomorphisms {
         self.0.len()
     }
 
-    pub fn iter(&self) -> std::slice::Iter<Characteristic> {
+    pub fn iter(&self) -> std::slice::Iter<'_, Characteristic> {
         self.0.iter()
     }
 

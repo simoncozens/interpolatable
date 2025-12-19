@@ -79,7 +79,7 @@ impl Matching {
         self.len() == 0
     }
 
-    pub fn iter(&self) -> std::slice::Iter<Position> {
+    pub fn iter(&self) -> std::slice::Iter<'_, Position> {
         self.0.iter()
     }
 }
