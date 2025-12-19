@@ -73,12 +73,14 @@ pub(crate) fn test_starting_point(
                     0.0
                 };
                 let transform =
-                    Affine::rotate(theta).then_scale_non_uniform(lambda1.sqrt(), lambda2.sqrt());
+                    Affine::rotate(theta).pre_scale_non_uniform(lambda1.sqrt(), lambda2.sqrt());
                 transforms.push(transform);
             }
-            let mut new_c0 = vec![];
-            new_c0.push((transforms[0] * c0.rotated_list[0].to_point()).to_vec2());
-            new_c0.extend(c0.rotated_list.iter().skip(1).copied());
+            let new_c0: Vec<_> = c0
+                .rotated_list
+                .iter()
+                .map(|p| (transforms[0] * p.to_point()).to_vec2())
+                .collect();
             let new_contour1: Isomorphisms = Isomorphisms(
                 m1_isomorphisms
                     .iter()
