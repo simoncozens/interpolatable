@@ -59,9 +59,9 @@ pub(crate) fn test_contour_order<'a>(
         return (1.0, None);
     }
 
-    // Use the worst of the two matchings
-    let (matching, matching_cost, identity_cost) = if matching_cost_control / identity_cost_control
-        < matching_cost_green / identity_cost_green
+    // Use the best of the two matchings
+    let (matching, matching_cost, identity_cost) = if matching_cost_control * identity_cost_green
+        < matching_cost_green * identity_cost_control
     {
         (
             matching_control,

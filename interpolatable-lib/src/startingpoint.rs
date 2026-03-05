@@ -64,7 +64,7 @@ pub(crate) fn test_starting_point(
                 let b = correlation * stddev_x * stddev_y;
                 let delta = (((a - c) * 0.5).powi(2) + b * b).powf(0.5);
                 let lambda1 = (a + c) * 0.5 + delta;
-                let lambda2 = (a + c) * 0.5 - delta;
+                let mut lambda2 = (a + c) * 0.5 - delta;
                 let theta = if b != 0.0 {
                     (lambda1 - a).atan2(b)
                 } else if a < c {
@@ -72,6 +72,10 @@ pub(crate) fn test_starting_point(
                 } else {
                     0.0
                 };
+                // Guard against negative lambda2 due to floating-point imprecision
+                if lambda2 < 0.0 {
+                    lambda2 = 0.0;
+                }
                 let transform =
                     Affine::rotate(theta).pre_scale_non_uniform(lambda1.sqrt(), lambda2.sqrt());
                 transforms.push(transform);
