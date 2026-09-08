@@ -4,12 +4,12 @@ mod plot;
 use std::{collections::HashMap, path::PathBuf};
 
 use clap::Parser;
-use fontations::read::TableProvider;
-use fontations::skrifa::{setting::VariationSetting, FontRef, GlyphId, MetadataProvider};
 use indexmap::IndexMap;
 use indicatif::ProgressIterator;
 use interpolatable::{run_tests, utils::glyph_variations, Problem};
 use plot::InterpolatablePlot;
+use skrifa::raw::TableProvider;
+use skrifa::{setting::VariationSetting, FontRef, GlyphId, MetadataProvider};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -44,13 +44,13 @@ fn main() {
         if !args.glyphs.is_empty() && !args.glyphs.contains(&glyph_name) {
             continue;
         }
-        let mut default_glyph = interpolatable::Glyph::new_from_font(&font, gid.into(), &[])
+        let mut default_glyph = interpolatable::Glyph::new_from_font(&fontdata, gid.into(), &[])
             .expect("Can't convert glyph");
         default_glyph.master_name = "default".to_string();
         default_glyph.master_index = 0;
         if let Ok(variations) = glyph_variations(&font, gid.into()) {
             let variation_glyphs = variations.iter().map(|loc| {
-                let mut glyph = interpolatable::Glyph::new_from_font(&font, gid.into(), loc)
+                let mut glyph = interpolatable::Glyph::new_from_font(&fontdata, gid.into(), loc)
                     .expect("Couldn't convert glyph");
                 glyph.master_name = loc
                     .iter()
@@ -83,7 +83,7 @@ fn main() {
                             .map(|s| s.to_string())
                             .unwrap_or_else(|| format!("gid{}", gid));
                         if !args.json {
-                            println!("Problems with glyph {}:", &glyphname);
+                            println!("Problems with glyph {}:", glyphname);
                             for problem in problems.iter() {
                                 println!("  {:#?}", problem);
                             }

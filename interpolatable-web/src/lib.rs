@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
-use fontations::read::TableProvider;
-use fontations::skrifa::{setting::VariationSetting, GlyphId, MetadataProvider};
 use indexmap::IndexMap;
 use interpolatable::{
     run_tests,
     utils::{glyph_variations, DenormalizeLocation},
 };
 use serde_json::{json, Value};
+use skrifa::raw::TableProvider;
+use skrifa::{setting::VariationSetting, GlyphId, MetadataProvider};
 use wasm_bindgen::prelude::*;
 extern crate console_error_panic_hook;
 
@@ -37,23 +37,30 @@ extern "C" {
 
 #[wasm_bindgen]
 pub fn check_font(font_data: &[u8]) -> Result<String, JsValue> {
-    let font = fontations::skrifa::FontRef::new(font_data).map_err(|e| e.to_string())?;
+    let font = skrifa::FontRef::new(font_data).map_err(|e| e.to_string())?;
 
     let mut report: IndexMap<String, Vec<Value>> = IndexMap::new();
     let mut glyphname_to_id: HashMap<String, GlyphId> = HashMap::new();
     let mut locations: Vec<Vec<VariationSetting>> = vec![vec![]];
     let glyphnames = font.glyph_names();
-    let default_location = font
+    let default_location_fontdrasil = font
         .denormalize_location(&vec![0.0; font.fvar().unwrap().axes().unwrap().len()])
         .unwrap();
+    let default_location = default_location_fontdrasil
+        .iter()
+        .map(|(tag, value)| VariationSetting {
+            selector: *tag,
+            value: value.to_f64() as f32,
+        })
+        .collect::<Vec<_>>();
     for gid in 0..font.maxp().expect("Can't open maxp table").num_glyphs() {
-        let mut default_glyph = interpolatable::Glyph::new_from_font(&font, gid.into(), &[])
+        let mut default_glyph = interpolatable::Glyph::new_from_font(font_data, gid.into(), &[])
             .expect("Can't convert glyph");
         default_glyph.master_name = "default".to_string();
         default_glyph.master_index = 0;
         if let Ok(variations) = glyph_variations(&font, gid.into()) {
             let variation_glyphs = variations.iter().map(|loc| {
-                let mut glyph = interpolatable::Glyph::new_from_font(&font, gid.into(), loc)
+                let mut glyph = interpolatable::Glyph::new_from_font(font_data, gid.into(), loc)
                     .expect("Couldn't convert glyph");
                 glyph.master_name = loc
                     .iter()
@@ -95,7 +102,7 @@ pub fn check_font(font_data: &[u8]) -> Result<String, JsValue> {
                             .collect::<Vec<_>>();
                         let midway_location = lerp_location(before_loc, after_loc, 0.5);
                         let midway_glyph = interpolatable::Glyph::new_from_font(
-                            &font,
+                            font_data,
                             gid.into(),
                             &midway_location,
                         )

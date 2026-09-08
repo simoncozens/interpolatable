@@ -1,3 +1,4 @@
+#![allow(clippy::useless_conversion)] // macro weirdness
 use ::interpolatable::{BezGlyph, Glyph as TwisterGlyph};
 use pyo3::{exceptions::PyTypeError, prelude::*};
 use pythonize::pythonize;
@@ -88,7 +89,7 @@ fn test_interpolatability<'py>(
 ) -> PyResult<Bound<'py, PyAny>> {
     let result = ::interpolatable::run_tests(&glyph_a.0, &glyph_b.0, tolerance, kinkiness, upem);
     println!("{:?}", result);
-    pythonize(py, &result).map_err(|e| PyErr::new::<PyTypeError, _>("Error message"))
+    pythonize(py, &result).map_err(|_| PyErr::new::<PyTypeError, _>("Error message"))
 }
 
 #[pymodule]

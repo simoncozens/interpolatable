@@ -1,5 +1,5 @@
 // use kurbo::{BezPath, PathEl};
-use fontations::skrifa::outline::OutlinePen;
+use skrifa::outline::OutlinePen;
 
 // trait Draw {
 //     fn draw(&self, cairo: &cairo::Context);

@@ -1,12 +1,21 @@
 #[cfg(feature = "fontations")]
-use fontations::skrifa::{
-    raw::ReadError,
-    raw::{tables::fvar::VariationAxisRecord, TableProvider},
-    setting::VariationSetting,
-    FontRef, GlyphId,
+use std::collections::HashMap;
+
+#[cfg(feature = "fontations")]
+use fontdrasil::{
+    coords::{
+        CoordConverter, DesignCoord, NormalizedCoord, NormalizedLocation, UserCoord, UserLocation,
+    },
+    types::Axes,
 };
 use kurbo::{BezPath, Vec2};
 use munkres::Position;
+#[cfg(feature = "fontations")]
+use skrifa::{
+    raw::{ReadError, TableProvider},
+    setting::VariationSetting,
+    FontRef, GlyphId, MetadataProvider as _, Tag,
+};
 
 pub(crate) fn lerp_curve(c0: &BezPath, c1: &BezPath) -> Option<BezPath> {
     let mut new = BezPath::new();
@@ -84,49 +93,78 @@ impl Matching {
     }
 }
 
-fn lerp(a: f32, b: f32, t: f32) -> f32 {
-    a + (b - a) * t
-}
-
-#[cfg(feature = "fontations")]
-fn poor_mans_denormalize(peak: f32, axis: &VariationAxisRecord) -> f32 {
-    // Insert avar here
-
-    if peak > 0.0 {
-        lerp(
-            axis.default_value().to_f32(),
-            axis.max_value().to_f32(),
-            peak,
-        )
-    } else {
-        lerp(
-            axis.default_value().to_f32(),
-            axis.min_value().to_f32(),
-            -peak,
-        )
-    }
-}
-
 #[cfg(feature = "fontations")]
 /// A trait for denormalizing a location tuple into a friendly representation in userspace.
 pub trait DenormalizeLocation {
     /// Given a normalized location tuple, turn it back into a friendly representation in userspace
-    fn denormalize_location(&self, tuple: &[f32]) -> Result<Vec<VariationSetting>, ReadError>;
+    fn denormalize_location(&self, tuple: &[f32]) -> Result<UserLocation, ReadError>;
 }
 
 #[cfg(feature = "fontations")]
 impl DenormalizeLocation for FontRef<'_> {
-    fn denormalize_location(&self, tuple: &[f32]) -> Result<Vec<VariationSetting>, ReadError> {
-        let all_axes = self.fvar()?.axes()?;
-        Ok(all_axes
+    fn denormalize_location(&self, tuple: &[f32]) -> Result<UserLocation, ReadError> {
+        let per_axis_maps = if let Ok(segments) = self.avar().map(|x| x.axis_segment_maps()) {
+            segments.iter().collect::<Result<Vec<_>, _>>()?
+        } else {
+            vec![]
+        };
+        let axes: Axes = self
+            .axes()
             .iter()
-            .zip(tuple)
-            .filter(|&(_axis, peak)| *peak != 0.0)
-            .map(|(axis, peak)| {
-                let value = poor_mans_denormalize(*peak, axis);
-                (axis.axis_tag().to_string().as_str(), value).into()
+            .enumerate()
+            .map(|(ix, axis)| {
+                let min = UserCoord::new(axis.min_value() as f64);
+                let default = UserCoord::new(axis.default_value() as f64);
+                let max = UserCoord::new(axis.max_value() as f64);
+                #[allow(clippy::unwrap_used)]
+                let mut fd_axis = fontdrasil::types::Axis {
+                    converter: CoordConverter::default_normalization(min, default, max),
+                    hidden: axis.is_hidden(),
+                    tag: Tag::new_checked(axis.tag().to_string().as_bytes()).unwrap(),
+                    name: "Doesn't matter".to_string(),
+                    min,
+                    default,
+                    max,
+                    localized_names: HashMap::new(), // Let's not
+                };
+                if let Some(map) = per_axis_maps.get(ix) {
+                    let desired_mapping: Vec<(
+                        fontdrasil::coords::Coord<fontdrasil::coords::UserSpace>,
+                        fontdrasil::coords::Coord<fontdrasil::coords::DesignSpace>,
+                    )> = map
+                        .axis_value_maps
+                        .iter()
+                        .map(|mapping| {
+                            let from = mapping.from_coordinate().to_f32();
+                            let to = mapping.to_coordinate().to_f32();
+                            // These are both normalized coordinates. Turn the `from` back into
+                            // userspace using default normalization
+                            let user_from =
+                                NormalizedCoord::new(from as f64).to_user(&fd_axis.converter);
+                            // Let's pretend design space is just normalized space
+                            let design_to = DesignCoord::new(to as f64);
+                            (user_from, design_to)
+                        })
+                        .collect();
+                    let default_idx = desired_mapping
+                        .iter()
+                        .position(|(_, to)| to.to_f64() == 0.0)
+                        .unwrap_or(0);
+                    fd_axis.converter = CoordConverter::new(desired_mapping, default_idx)
+                        .unwrap_or_else(|_| {
+                            CoordConverter::default_normalization(min, default, max)
+                        })
+                }
+                fd_axis
             })
-            .collect())
+            .collect();
+        let mut normal_location = NormalizedLocation::new();
+        for (axis, value) in axes.iter().zip(tuple.iter()) {
+            normal_location.insert(axis.tag, NormalizedCoord::new(*value as f64));
+        }
+        normal_location
+            .convert(&axes)
+            .map_err(|_| ReadError::MalformedData("Axis conversion error"))
     }
 }
 
@@ -148,7 +186,14 @@ pub fn glyph_variations(
         .tuples()
         .map(|t| {
             let tuple: Vec<f32> = t.peak().values.iter().map(|v| v.get().to_f32()).collect();
-            font.denormalize_location(&tuple)
+            font.denormalize_location(&tuple).map(|loc|
+                // Now back to Skrifa
+                loc.iter()
+                    .map(|(tag, value)| VariationSetting {
+                        selector: *tag,
+                        value: value.to_f64() as f32,
+                    })
+                    .collect::<Vec<_>>())
         })
         .collect();
     let mut variations = variations?;

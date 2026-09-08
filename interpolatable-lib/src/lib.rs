@@ -13,14 +13,14 @@
 //! It is a port of Behdad Esfahbod's [fontTools.varLib.interpolatable](https://github.com/fonttools/fonttools/).
 pub use bezglyph::BezGlyph;
 use core::fmt;
-#[cfg(feature = "fontations")]
-use fontations::skrifa::{prelude::*, setting::VariationSetting};
 use greencurves::{ComputeControlStatistics, ComputeGreenStatistics, CurveStatistics};
 use isomorphism::Isomorphisms;
 #[cfg(feature = "fontations")]
 use itertools::Itertools;
 use kurbo::{BezPath, Point};
 pub use problems::{Problem, ProblemDetails};
+#[cfg(feature = "fontations")]
+use skrifa::{prelude::*, setting::VariationSetting};
 use startingpoint::test_starting_point;
 use utils::lerp_curve;
 
@@ -197,17 +197,16 @@ impl Glyph {
     ///
     /// Uses the `skrifa` library to extract the glyph outline from the font.
     pub fn new_from_font(
-        font: &FontRef,
+        font: &[u8],
         glyph_id: GlyphId,
         location: &[VariationSetting],
     ) -> Option<Self> {
+        let font = FontRef::new(font).ok()?;
         let collection = font.outline_glyphs();
         let loc = font.axes().location(location);
         let outlined = collection.get(glyph_id)?;
-        let settings = fontations::skrifa::outline::DrawSettings::unhinted(
-            fontations::skrifa::prelude::Size::unscaled(),
-            &loc,
-        );
+        let settings =
+            skrifa::outline::DrawSettings::unhinted(skrifa::prelude::Size::unscaled(), &loc);
         let mut bezglyph = BezGlyph::default();
         outlined.draw(settings, &mut bezglyph).ok()?;
         let mut glyph: Glyph = bezglyph.into();
@@ -340,18 +339,18 @@ pub fn run_tests<'a>(
 mod tests {
     #![allow(clippy::expect_used)]
     #![allow(clippy::unwrap_used)]
-    use fontations::skrifa::{FontRef, MetadataProvider};
     use serde_json::json;
+    use skrifa::{FontRef, MetadataProvider};
 
     use super::*;
 
     #[test]
     fn test_stuff() {
-        let fontdata = include_bytes!("../NotoSerif-Italic.ttf");
+        let fontdata = include_bytes!("../tests/NotoSerif-Italic.ttf");
         let font = FontRef::new(fontdata).expect("Can't parse font");
         let glyph_id = font.charmap().map('C').unwrap();
         assert_eq!(glyph_id.to_u32(), 38);
-        let interpolatable_glyph = Glyph::new_from_font(&font, glyph_id, &[]).expect("Fail");
+        let interpolatable_glyph = Glyph::new_from_font(fontdata, glyph_id, &[]).expect("Fail");
 
         assert_eq!(
             interpolatable_glyph.green_vectors[0],
@@ -368,12 +367,12 @@ mod tests {
 
     #[test]
     fn test_contour_order() {
-        let fontdata = include_bytes!("../variable_ttf/TwisterTest-VF.ttf");
+        let fontdata = include_bytes!("../tests/TwisterTest-VF.ttf");
         let font = FontRef::new(fontdata).expect("Can't parse font");
         let glyph_id = font.charmap().map('A').unwrap();
-        let glyph1 = Glyph::new_from_font(&font, glyph_id, &[]).expect("Fail");
+        let glyph1 = Glyph::new_from_font(fontdata, glyph_id, &[]).expect("Fail");
         let glyph2 =
-            Glyph::new_from_font(&font, glyph_id, &[("wght", 800.0).into()]).expect("Fail");
+            Glyph::new_from_font(fontdata, glyph_id, &[("wght", 800.0).into()]).expect("Fail");
         let problems = run_tests(&glyph1, &glyph2, None, None, None);
         assert_eq!(problems.len(), 1);
         let problem = serde_json::to_value(&problems[0]).unwrap();
@@ -386,10 +385,10 @@ mod tests {
 
     #[test]
     fn test_isomorphisms() {
-        let fontdata = include_bytes!("../NotoSerif-Italic.ttf");
+        let fontdata = include_bytes!("../tests/NotoSerif-Italic.ttf");
         let font = FontRef::new(fontdata).expect("Can't parse font");
         let glyph_id = font.charmap().map('b').unwrap();
-        let interpolatable_glyph = Glyph::new_from_font(&font, glyph_id, &[]).expect("Fail");
+        let interpolatable_glyph = Glyph::new_from_font(fontdata, glyph_id, &[]).expect("Fail");
         assert_eq!(interpolatable_glyph.points[0].len(), 43);
         assert_eq!(interpolatable_glyph.isomorphisms.len(), 2);
         assert_eq!(interpolatable_glyph.isomorphisms[0].len(), 1);

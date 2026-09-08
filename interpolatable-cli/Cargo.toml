@@ -1,6 +1,6 @@
 [package]
 name = "interpolatable-cli"
-version = "1.1.0"
+version = "1.2.0"
 edition = "2021"
 
 [[bin]]
@@ -10,7 +10,7 @@ name = "interpolatable"
 [dependencies]
 interpolatable = { path = "../interpolatable-lib", features = ["fontations"] }
 serde_json = { workspace = true, features = ["preserve_order"] }
-fontations = { workspace = true }
+skrifa = { workspace = true }
 clap = { version = "3.2.5", features = ["derive"] }
 cairo-rs = { version = "0.20", features = ["pdf"] }
 sha1_smol = "1.0"

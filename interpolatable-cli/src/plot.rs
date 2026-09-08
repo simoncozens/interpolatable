@@ -4,13 +4,13 @@ use std::{
 };
 
 use cairo::{Context, Error, FontSlant, FontWeight, Surface};
-use fontations::skrifa::{
-    self, setting::VariationSetting, string::StringId, FontRef, GlyphId, MetadataProvider,
-};
 use indexmap::IndexMap;
 use interpolatable::{BezGlyph, Glyph, Problem};
 use itertools::Itertools;
 use kurbo::{Rect, Shape};
+use skrifa::{
+    self, setting::VariationSetting, string::StringId, FontRef, GlyphId, MetadataProvider,
+};
 
 use crate::cairopen::CairoPen;
 

@@ -35,7 +35,7 @@ impl BezGlyph {
 }
 
 #[cfg(feature = "fontations")]
-impl fontations::skrifa::outline::OutlinePen for BezGlyph {
+impl skrifa::outline::OutlinePen for BezGlyph {
     fn move_to(&mut self, x: f32, y: f32) {
         self.next().move_to((x, y));
     }
