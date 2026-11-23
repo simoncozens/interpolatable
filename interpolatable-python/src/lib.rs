@@ -55,17 +55,17 @@ fn replay_recording(bezglyph: &mut BezGlyph, value: Vec<(String, Vec<(f32, f32)>
 #[pymethods]
 impl Glyph {
     #[new]
-    fn __new__(
+    fn __new__<'py>(
         py: Python,
         master_name: String,
         master_index: usize,
-        obj: PyObject,
-        glyphset: PyObject,
+        obj: Bound<'py, PyAny>,
+        glyphset: Bound<'py, PyAny>,
     ) -> PyResult<Self> {
-        let recordingpen_m = PyModule::import_bound(py, "fontTools.pens.recordingPen")?;
+        let recordingpen_m = PyModule::import(py, "fontTools.pens.recordingPen")?;
         let recordingpen = recordingpen_m.getattr("DecomposingRecordingPen")?;
         let pen = recordingpen.call1((glyphset,))?;
-        obj.call_method1(py, "draw", (&pen,))?;
+        obj.call_method1("draw", (&pen,))?;
         let value: Vec<(String, Vec<(f32, f32)>)> = pen.getattr("value")?.extract()?;
         let mut bezglyph = BezGlyph::default();
         replay_recording(&mut bezglyph, value);
