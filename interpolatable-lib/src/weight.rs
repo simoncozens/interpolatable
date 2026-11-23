@@ -1,4 +1,4 @@
-use greencurves::ComputeGreenStatistics;
+use crate::greencurves::ComputeGreenStatistics;
 use kurbo::BezPath;
 
 use crate::{problems::Problem, stats_to_vectors, Glyph};

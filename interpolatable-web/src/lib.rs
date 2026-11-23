@@ -60,8 +60,20 @@ pub fn check_font(font_data: &[u8]) -> Result<String, JsValue> {
         default_glyph.master_index = 0;
         if let Ok(variations) = glyph_variations(&font, gid.into()) {
             let variation_glyphs = variations.iter().map(|loc| {
-                let mut glyph = interpolatable::Glyph::new_from_font(font_data, gid.into(), loc)
-                    .expect("Couldn't convert glyph");
+                let boring_location = loc
+                    .iter()
+                    .map(|v| (v.selector.to_string(), v.value))
+                    .collect::<Vec<_>>();
+                let mut glyph = interpolatable::Glyph::new_from_font(
+                    font_data,
+                    gid.into(),
+                    boring_location
+                        .iter()
+                        .map(|x| (x.0.as_str(), x.1))
+                        .collect::<Vec<_>>()
+                        .as_slice(),
+                )
+                .expect("Couldn't convert glyph");
                 glyph.master_name = loc
                     .iter()
                     .map(|v| format!("{}={}", v.selector, v.value))
@@ -101,10 +113,18 @@ pub fn check_font(font_data: &[u8]) -> Result<String, JsValue> {
                             .map(|p| serde_json::to_value(p).unwrap())
                             .collect::<Vec<_>>();
                         let midway_location = lerp_location(before_loc, after_loc, 0.5);
+                        let boring_location = midway_location
+                            .iter()
+                            .map(|v| (v.selector.to_string(), v.value))
+                            .collect::<Vec<_>>();
                         let midway_glyph = interpolatable::Glyph::new_from_font(
                             font_data,
                             gid.into(),
-                            &midway_location,
+                            boring_location
+                                .iter()
+                                .map(|x| (x.0.as_str(), x.1))
+                                .collect::<Vec<_>>()
+                                .as_slice(),
                         )
                         .ok_or("Can't convert glyph")?;
                         let midway_name = midway_location

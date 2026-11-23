@@ -13,7 +13,8 @@
 //! It is a port of Behdad Esfahbod's [fontTools.varLib.interpolatable](https://github.com/fonttools/fonttools/).
 pub use bezglyph::BezGlyph;
 use core::fmt;
-use greencurves::{ComputeControlStatistics, ComputeGreenStatistics, CurveStatistics};
+mod greencurves;
+use crate::greencurves::{ComputeControlStatistics, ComputeGreenStatistics, CurveStatistics};
 use isomorphism::Isomorphisms;
 #[cfg(feature = "fontations")]
 use itertools::Itertools;

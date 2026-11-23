@@ -15,12 +15,12 @@ fontations = ["dep:skrifa"]
 
 [dev-dependencies]
 serde_json = "1.0"
+approx = "0.5"
 
 [dependencies]
-greencurves = "0.2.0"
 kurbo = { workspace = true }
 skrifa = { workspace = true, optional = true }
 munkres = "0.5"
 serde = { version = "1.0", features = ["derive"] }
 itertools = "0.13"
-fontdrasil = "1.0.0"
+fontdrasil = "2.0.0"

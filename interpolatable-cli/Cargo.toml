@@ -11,7 +11,7 @@ name = "interpolatable"
 interpolatable = { path = "../interpolatable-lib", features = ["fontations"] }
 serde_json = { workspace = true, features = ["preserve_order"] }
 skrifa = { workspace = true }
-clap = { version = "3.2.5", features = ["derive"] }
+clap = { version = "4.6.9", features = ["derive"] }
 cairo-rs = { version = "0.20", features = ["pdf"] }
 sha1_smol = "1.0"
 itertools = "0.13.0"
