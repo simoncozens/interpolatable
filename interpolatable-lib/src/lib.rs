@@ -20,7 +20,7 @@ use itertools::Itertools;
 use kurbo::{BezPath, Point};
 pub use problems::{Problem, ProblemDetails};
 #[cfg(feature = "fontations")]
-use skrifa::{prelude::*, setting::VariationSetting};
+use skrifa::prelude::*;
 use startingpoint::test_starting_point;
 use utils::lerp_curve;
 
@@ -196,11 +196,7 @@ impl Glyph {
     /// Create a new glyph from a font and a glyph ID
     ///
     /// Uses the `skrifa` library to extract the glyph outline from the font.
-    pub fn new_from_font(
-        font: &[u8],
-        glyph_id: GlyphId,
-        location: &[VariationSetting],
-    ) -> Option<Self> {
+    pub fn new_from_font(font: &[u8], glyph_id: GlyphId, location: &[(&str, f32)]) -> Option<Self> {
         let font = FontRef::new(font).ok()?;
         let collection = font.outline_glyphs();
         let loc = font.axes().location(location);
@@ -212,7 +208,7 @@ impl Glyph {
         let mut glyph: Glyph = bezglyph.into();
         glyph.master_name = location
             .iter()
-            .map(|x| format!("{}={}", x.selector, x.value))
+            .map(|x| format!("{}={}", x.0, x.1))
             .join(" ");
         Some(glyph)
     }
@@ -371,8 +367,7 @@ mod tests {
         let font = FontRef::new(fontdata).expect("Can't parse font");
         let glyph_id = font.charmap().map('A').unwrap();
         let glyph1 = Glyph::new_from_font(fontdata, glyph_id, &[]).expect("Fail");
-        let glyph2 =
-            Glyph::new_from_font(fontdata, glyph_id, &[("wght", 800.0).into()]).expect("Fail");
+        let glyph2 = Glyph::new_from_font(fontdata, glyph_id, &[("wght", 800.0)]).expect("Fail");
         let problems = run_tests(&glyph1, &glyph2, None, None, None);
         assert_eq!(problems.len(), 1);
         let problem = serde_json::to_value(&problems[0]).unwrap();

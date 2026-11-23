@@ -50,8 +50,20 @@ fn main() {
         default_glyph.master_index = 0;
         if let Ok(variations) = glyph_variations(&font, gid.into()) {
             let variation_glyphs = variations.iter().map(|loc| {
-                let mut glyph = interpolatable::Glyph::new_from_font(&fontdata, gid.into(), loc)
-                    .expect("Couldn't convert glyph");
+                let boring_loc = loc
+                    .iter()
+                    .map(|v| (v.selector.to_string(), v.value))
+                    .collect::<Vec<_>>();
+                let mut glyph = interpolatable::Glyph::new_from_font(
+                    &fontdata,
+                    gid.into(),
+                    boring_loc
+                        .iter()
+                        .map(|x| (x.0.as_str(), x.1))
+                        .collect::<Vec<_>>()
+                        .as_slice(),
+                )
+                .expect("Couldn't convert glyph");
                 glyph.master_name = loc
                     .iter()
                     .map(|v| format!("{}={}", v.selector, v.value))
